@@ -4,8 +4,7 @@ name: 02 CI Workflow
 
 on:
   # Run automatically when app code, tests, or this workflow file changes.
-  schedule:
-    - cron: "28 10 * * *"
+ 
   # Allow a safe manual run before students trigger it with a code change.
   workflow_dispatch:
 
@@ -13,6 +12,11 @@ jobs:
   run-tests:
     # The runner is the temporary machine that executes the steps below.
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
 
     steps:
       - name: Check out repository
@@ -23,7 +27,7 @@ jobs:
         # Prepare Python on the runner. This does not change the student laptop.
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
 
       - name: Show runner time
         run: date
