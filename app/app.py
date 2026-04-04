@@ -9,6 +9,8 @@ def route_request(path):
     return 404, {"error": "not found"}
 
 
+
+
 class AppHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         status_code, payload = route_request(self.path)
