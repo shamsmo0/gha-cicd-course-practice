@@ -66,12 +66,10 @@ jobs:
         run: |
           echo "Build for Python ${{ matrix.python-version }}" > output.txt
       
-      - name: Upload build artifact
-        # Store the packaged output so a later workflow can use the exact same package.
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.IMAGE_TAR }}
-          retention-days: 7
+          name: artifact-${{ matrix.python-version }}
+          path: output.txt
 
 
