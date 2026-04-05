@@ -1,0 +1,44 @@
+name: Build Docker Image
+
+on:
+  workflow_dispatch: 
+
+env:
+  IMAGE_NAME: tiny-health-app-vars
+  CONTAINER_NAME: tiny-health-container-va
+  BASE_IMAGE: python:3.12-slim
+  APP_PORT: 8000
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            --build-arg BASE_IMAGE=${{ env.BASE_IMAGE }} \
+            -t ${{ env.IMAGE_NAME }} .
+
+      - name: Run Container
+        run: |
+          docker run -d \
+            -p ${{ env.APP_PORT }}:${{ env.APP_PORT }} \
+            --name ${{ env.CONTAINER_NAME }} \
+            ${{ env.IMAGE_NAME }}
+            
+      - name: Smoke test deployed app
+        # Retry a few times because app startup can take a moment.
+        run: |
+          for attempt in 1 2 3 4 5; do
+            if curl --fail --silent http://127.0.0.1:8000/health; then
+              exit 0
+            fi
+            echo "Waiting for app to become ready..."
+            sleep 2
+          done
+          echo "App did not become ready in time."
+          exit 1
